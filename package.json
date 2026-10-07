@@ -1,0 +1,47 @@
+{
+  "name": "cubemx-user-code-guard",
+  "displayName": "CubeMX User Code Guard",
+  "description": "Highlights STM32CubeMX generated code and warns when you edit outside USER CODE regions.",
+  "version": "0.0.4",
+  "publisher": "local-dev",
+  "engines": { "vscode": "^1.85.0" },
+  "categories": ["Other", "Programming Languages"],
+  "activationEvents": ["onLanguage:c", "onLanguage:cpp", "onView:cubemxOutline"],
+  "main": "./extension.js",
+  "contributes": {
+    "views": {
+      "explorer": [
+        {
+          "id": "cubemxOutline",
+          "name": "CubeMXOutline"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "CubeMX User Code Guard",
+      "properties": {
+        "cubemxUserCodeGuard.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Shade generated lines and warn about edits outside CubeMX USER CODE regions."
+        },
+        "cubemxUserCodeGuard.warningCooldownMs": {
+          "type": "number",
+          "default": 1800,
+          "minimum": 0,
+          "description": "Minimum time between edit warnings for the same document."
+        },
+        "cubemxUserCodeGuard.generatedBackground": {
+          "type": "string",
+          "default": "rgba(128, 128, 128, 0.18)",
+          "description": "Background color for generated lines."
+        },
+        "cubemxUserCodeGuard.userCodeBackground": {
+          "type": "string",
+          "default": "editor.background",
+          "description": "Background color for editable USER CODE lines. Use editor.background to follow the current theme."
+        }
+      }
+    }
+  }
+}

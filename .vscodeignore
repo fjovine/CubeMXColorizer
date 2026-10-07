@@ -1,0 +1,4 @@
+.vscode/**
+package-vsix.bat
+*.vsix
+*.zip
