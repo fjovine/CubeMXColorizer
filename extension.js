@@ -16,6 +16,7 @@ function colorValue(value) {
 function parseUserRegions(text) {
   const lines = text.split(/\r?\n/);
   const regions = [];
+  const isCubeMX = lines.some((line) => BEGIN_RE.test(line) || END_RE.test(line));
   let open = null;
   for (let i = 0; i < lines.length; i += 1) {
     if (BEGIN_RE.test(lines[i]) && open === null) {
@@ -38,7 +39,7 @@ function parseUserRegions(text) {
       }
     }
   }
-  return { lines, regions };
+  return { lines, regions, isCubeMX };
 }
 
 function isEditableLine(line, regions) {
@@ -56,6 +57,9 @@ class CubeMXOutlineProvider {
   }
 
   getTreeItem(section) {
+    if (section.notCubeMX) {
+      return new vscode.TreeItem('Not CubeMX file', vscode.TreeItemCollapsibleState.None);
+    }
     const item = new vscode.TreeItem(`User code ${section.label}`, vscode.TreeItemCollapsibleState.None);
     item.command = {
       command: 'cubemxOutline.jumpToSection',
@@ -70,7 +74,8 @@ class CubeMXOutlineProvider {
   getChildren() {
     const editor = vscode.window.activeTextEditor;
     if (!editor || !['c', 'cpp'].includes(editor.document.languageId)) return [];
-    const { regions } = parseUserRegions(editor.document.getText());
+    const { regions, isCubeMX } = parseUserRegions(editor.document.getText());
+    if (!isCubeMX) return [{ notCubeMX: true }];
     return regions.map((region) => ({
       uri: editor.document.uri,
       label: region.label,
@@ -87,7 +92,12 @@ function updateEditor(editor, generatedDecoration, userDecoration) {
     return;
   }
 
-  const { lines, regions } = parseUserRegions(editor.document.getText());
+  const { lines, regions, isCubeMX } = parseUserRegions(editor.document.getText());
+  if (!isCubeMX) {
+    editor.setDecorations(generatedDecoration, []);
+    editor.setDecorations(userDecoration, []);
+    return;
+  }
   const generated = [];
   const editable = [];
   for (let line = 0; line < lines.length; line += 1) {
@@ -99,7 +109,8 @@ function updateEditor(editor, generatedDecoration, userDecoration) {
 }
 
 function editTouchesGenerated(oldText, change) {
-  const { lines, regions } = parseUserRegions(oldText);
+  const { lines, regions, isCubeMX } = parseUserRegions(oldText);
+  if (!isCubeMX) return false;
   const start = change.range.start.line;
   const end = Math.min(change.range.end.line, lines.length - 1);
   // A zero-width insertion still edits the containing line.
@@ -122,6 +133,7 @@ function activate(context) {
   const lastWarning = new Map();
   const outlineProvider = new CubeMXOutlineProvider();
   const outlineView = vscode.window.createTreeView('cubemxOutline', { treeDataProvider: outlineProvider });
+  outlineView.title = `CubeMXOutline -ver ${context.extension.packageJSON.version}`;
 
   const refresh = (editor) => {
     if (!editor || !['c', 'cpp'].includes(editor.document.languageId)) return;

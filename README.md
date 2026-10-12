@@ -6,6 +6,7 @@ A small VS Code extension prototype for STM32CubeMX C/C++ files.
 - Lines inside those markers use the editor's normal background by default.
 - Editing outside a marked region shows a warning with an **Undo** action.
 - The **CubeMXOutline** view in the Explorer lists only marked blocks, for example `User code RTOS_THREADS`. Selecting one takes you to its first editable line in the active C/C++ file.
+- C/C++ source and header files without `USER CODE BEGIN` or `USER CODE END` markers keep their normal appearance and are freely editable without warnings. **CubeMXOutline** displays `Not CubeMX file` for these files.
 
 ## Try it in VS Code
 

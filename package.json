@@ -2,7 +2,7 @@
   "name": "cubemx-user-code-guard",
   "displayName": "CubeMX User Code Guard",
   "description": "Highlights STM32CubeMX generated code and warns when you edit outside USER CODE regions.",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "publisher": "local-dev",
   "engines": { "vscode": "^1.85.0" },
   "categories": ["Other", "Programming Languages"],
